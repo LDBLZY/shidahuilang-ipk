@@ -6,7 +6,7 @@
 # Blog: https://p3terx.com
 #=================================================
 
-name: 设置工作流
+name: 自动工作流
 
 on: 
   repository_dispatch:
