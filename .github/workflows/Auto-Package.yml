@@ -40,7 +40,7 @@ jobs:
     - name: 结束工作流
       uses: actions/checkout@v3
 
-    - name: cancel running workflows
+    - name: 取消运行工作流
       uses: styfle/cancel-workflow-action@main
       if: contains(github.event.action, 'cw')
       with:
