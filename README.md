@@ -6,7 +6,7 @@
 
 ##### 特色:
 
- openwrt下small-package包插件x86编译.
+ openwrt下package最新插件
 
  .* 编译所有软件包
 
