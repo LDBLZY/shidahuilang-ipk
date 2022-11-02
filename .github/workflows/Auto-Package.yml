@@ -41,7 +41,7 @@ jobs:
       uses: actions/checkout@v3
 
     - name: 取消运行工作流
-      uses: styfle/cancel-workflow-action@main
+      uses: actions/checkout@v3
       if: contains(github.event.action, 'cw')
       with:
         workflow_id: 13660847
