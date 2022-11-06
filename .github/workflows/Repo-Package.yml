@@ -75,7 +75,7 @@ jobs:
       continue-on-error: true
       if: env.UPLOAD_FIRMWARE_FOR_RELEASE == 'true' && !cancelled()
       with:
-        keep_latest: 10
+        keep_latest: 50
         delete_tags: false
       env:
         GITHUB_TOKEN: ${{ secrets.REPO_TOKEN }}  
