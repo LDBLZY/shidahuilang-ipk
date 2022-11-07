@@ -65,7 +65,18 @@ jobs:
         echo "UPLOAD_FIRMWARE_TO_COWTRANSFER=${UPLOAD_FIRMWARE_TO_COWTRANSFER}" >> $GITHUB_ENV
         echo "UPLOAD_FIRMWARE_TO_WETRANSFER=${UPLOAD_FIRMWARE_TO_WETRANSFER}" >> $GITHUB_ENV
         sed -i "1a REPO_TOKEN=${{ secrets.REPO_TOKEN }}" ${GITHUB_WORKSPACE}/devices/common/custom.sh
-
+        if [ ${{matrix.target}} == "ac2100" ]; then
+            echo "MTARGET=mipsel_24kc" >> $GITHUB_ENV
+        elif [ ${{matrix.target}} == "x86_64" ]; then
+            echo "MTARGET=x86_64" >> $GITHUB_ENV
+        elif [ ${{matrix.target}} == "Rpi-4B" ]; then
+            echo "MTARGET=aarch64_cortex-a72-Rpi" >> $GITHUB_ENV
+         elif [ ${{matrix.target}} == "nanopi-r2s" ]; then
+            echo "MTARGET=aarch64_generic-nanopi" >> $GITHUB_ENV
+         elif [ ${{matrix.target}} == "N1" ]; then
+            echo "MTARGET=aarch64_cortex-a53-n1" >> $GITHUB_ENV
+        fi
+        
     - name: Trigger Packages Update
       run: |
         gitdate=$(curl -H "Authorization: token ${{ secrets.REPO_TOKEN }}" -s "https://api.github.com/repos/makebl/packages/actions/runs" | jq -r '.workflow_runs[0].created_at')
@@ -106,29 +117,29 @@ jobs:
             curl -fL -m 150 -o sdk.tar.xz https://downloads.openwrt.org/releases/$REPO_BRANCH/targets/ramips/mt7621/openwrt-sdk-$REPO_BRANCH-ramips-mt7621_gcc-11.2.0_musl.Linux-x86_64.tar.xz || curl -fL -m 150 -o sdk.tar.xz https://downloads.cdn.openwrt.org/releases/$REPO_BRANCH/targets/ramips/mt7621/openwrt-sdk-$REPO_BRANCH-ramips-mt7621_gcc-11.2.0_musl.Linux-x86_64.tar.xz 
         elif [[ ${{matrix.target}} == "x86_64" ]]; then
             curl -fL -m 150 -o sdk.tar.xz https://downloads.openwrt.org/releases/$REPO_BRANCH/targets/x86/64/openwrt-sdk-$REPO_BRANCH-x86-64_gcc-11.2.0_musl.Linux-x86_64.tar.xz || curl -fL -m 150 -o sdk.tar.xz https://downloads.cdn.openwrt.org/releases/$REPO_BRANCH/targets/x86/64/openwrt-sdk-$REPO_BRANCH-x86-64_gcc-11.2.0_musl.Linux-x86_64.tar.xz
-        elif [[ ${{matrix.target}} == "i386_pentium4" ]]; then
-            curl -fL -m 150 -o sdk.tar.xz https://downloads.openwrt.org/releases/$REPO_BRANCH/targets/x86/generic/openwrt-sdk-$REPO_BRANCH-x86-generic_gcc-11.2.0_musl.Linux-x86_64.tar.xz || curl -fL -m 150 -o sdk.tar.xz https://downloads.cdn.openwrt.org/releases/$REPO_BRANCH/targets/x86/generic/openwrt-sdk-$REPO_BRANCH-x86-generic_gcc-11.2.0_musl.Linux-x86_64.tar.xz
+        #elif [[ ${{matrix.target}} == "i386_pentium4" ]]; then
+           # curl -fL -m 150 -o sdk.tar.xz https://downloads.openwrt.org/releases/$REPO_BRANCH/targets/x86/generic/openwrt-sdk-$REPO_BRANCH-x86-generic_gcc-11.2.0_musl.Linux-x86_64.tar.xz || curl -fL -m 150 -o sdk.tar.xz https://downloads.cdn.openwrt.org/releases/$REPO_BRANCH/targets/x86/generic/openwrt-sdk-$REPO_BRANCH-x86-generic_gcc-11.2.0_musl.Linux-x86_64.tar.xz
         elif [[ ${{matrix.target}} == "aarch64_generic" ]]; then
             curl -fL -m 150 -o sdk.tar.xz https://downloads.openwrt.org/releases/$REPO_BRANCH/targets/rockchip/armv8/openwrt-sdk-$REPO_BRANCH-rockchip-armv8_gcc-11.2.0_musl.Linux-x86_64.tar.xz || curl -fL -m 150 -o sdk.tar.xz https://downloads.cdn.openwrt.org/releases/$REPO_BRANCH/targets/rockchip/armv8/openwrt-sdk-$REPO_BRANCH-rockchip-armv8_gcc-11.2.0_musl.Linux-x86_64.tar.xz
-        elif [[ ${{matrix.target}} == "arm_arm1176jzf-s_vfp" ]]; then
-            curl -fL -m 150 -o sdk.tar.xz https://downloads.openwrt.org/releases/$REPO_BRANCH/targets/bcm27xx/bcm2708/openwrt-sdk-$REPO_BRANCH-bcm27xx-bcm2708_gcc-11.2.0_musl_eabi.Linux-x86_64.tar.xz || curl -fL -m 150 -o sdk.tar.xz https://downloads.cdn.openwrt.org/releases/$REPO_BRANCH/targets/bcm27xx/bcm2708/openwrt-sdk-$REPO_BRANCH-bcm27xx-bcm2708_gcc-11.2.0_musl_eabi.Linux-x86_64.tar.xz
-        elif [[ ${{matrix.target}} == "arm_cortex-a15_neon-vfpv4" ]]; then
-            curl -fL -m 150 -o sdk.tar.xz https://downloads.openwrt.org/releases/$REPO_BRANCH/targets/ipq806x/generic/openwrt-sdk-$REPO_BRANCH-ipq806x-generic_gcc-11.2.0_musl_eabi.Linux-x86_64.tar.xz || curl -fL -m 150 -o sdk.tar.xz https://downloads.cdn.openwrt.org/releases/$REPO_BRANCH/targets/ipq806x/generic/openwrt-sdk-$REPO_BRANCH-ipq806x-generic_gcc-11.2.0_musl_eabi.Linux-x86_64.tar.xz
-        elif [[ ${{matrix.target}} == "arm_cortex-a5_vfpv4" ]]; then
-            curl -fL -m 150 -o sdk.tar.xz https://downloads.openwrt.org/releases/$REPO_BRANCH/targets/at91/sama5/openwrt-sdk-$REPO_BRANCH-at91-sama5_gcc-11.2.0_musl_eabi.Linux-x86_64.tar.xz || curl -fL -m 150 -o sdk.tar.xz https://downloads.cdn.openwrt.org/releases/$REPO_BRANCH/targets/at91/sama5/openwrt-sdk-$REPO_BRANCH-at91-sama5_gcc-11.2.0_musl_eabi.Linux-x86_64.tar.xz
-        elif [[ ${{matrix.target}} == "aarch64_cortex-a72" ]]; then
-            curl -fL -m 150 -o sdk.tar.xz https://downloads.openwrt.org/releases/$REPO_BRANCH/targets/bcm27xx/bcm2711/openwrt-sdk-$REPO_BRANCH-bcm27xx-bcm2711_gcc-11.2.0_musl.Linux-x86_64.tar.xz || curl -fL -m 150 -o sdk.tar.xz https://downloads.cdn.openwrt.org/releases/$REPO_BRANCH/targets/bcm27xx/bcm2711/openwrt-sdk-$REPO_BRANCH-bcm27xx-bcm2711_gcc-11.2.0_musl.Linux-x86_64.tar.xz
+        #elif [[ ${{matrix.target}} == "arm_arm1176jzf-s_vfp" ]]; then
+            #curl -fL -m 150 -o sdk.tar.xz https://downloads.openwrt.org/releases/$REPO_BRANCH/targets/bcm27xx/bcm2708/openwrt-sdk-$REPO_BRANCH-bcm27xx-bcm2708_gcc-11.2.0_musl_eabi.Linux-x86_64.tar.xz || curl -fL -m 150 -o sdk.tar.xz https://downloads.cdn.openwrt.org/releases/$REPO_BRANCH/targets/bcm27xx/bcm2708/openwrt-sdk-$REPO_BRANCH-bcm27xx-bcm2708_gcc-11.2.0_musl_eabi.Linux-x86_64.tar.xz
+        #elif [[ ${{matrix.target}} == "arm_cortex-a15_neon-vfpv4" ]]; then
+           # curl -fL -m 150 -o sdk.tar.xz https://downloads.openwrt.org/releases/$REPO_BRANCH/targets/ipq806x/generic/openwrt-sdk-$REPO_BRANCH-ipq806x-generic_gcc-11.2.0_musl_eabi.Linux-x86_64.tar.xz || curl -fL -m 150 -o sdk.tar.xz https://downloads.cdn.openwrt.org/releases/$REPO_BRANCH/targets/ipq806x/generic/openwrt-sdk-$REPO_BRANCH-ipq806x-generic_gcc-11.2.0_musl_eabi.Linux-x86_64.tar.xz
+        #elif [[ ${{matrix.target}} == "arm_cortex-a5_vfpv4" ]]; then
+           # curl -fL -m 150 -o sdk.tar.xz https://downloads.openwrt.org/releases/$REPO_BRANCH/targets/at91/sama5/openwrt-sdk-$REPO_BRANCH-at91-sama5_gcc-11.2.0_musl_eabi.Linux-x86_64.tar.xz || curl -fL -m 150 -o sdk.tar.xz https://downloads.cdn.openwrt.org/releases/$REPO_BRANCH/targets/at91/sama5/openwrt-sdk-$REPO_BRANCH-at91-sama5_gcc-11.2.0_musl_eabi.Linux-x86_64.tar.xz
+        #elif [[ ${{matrix.target}} == "aarch64_cortex-a72" ]]; then
+           # curl -fL -m 150 -o sdk.tar.xz https://downloads.openwrt.org/releases/$REPO_BRANCH/targets/bcm27xx/bcm2711/openwrt-sdk-$REPO_BRANCH-bcm27xx-bcm2711_gcc-11.2.0_musl.Linux-x86_64.tar.xz || curl -fL -m 150 -o sdk.tar.xz https://downloads.cdn.openwrt.org/releases/$REPO_BRANCH/targets/bcm27xx/bcm2711/openwrt-sdk-$REPO_BRANCH-bcm27xx-bcm2711_gcc-11.2.0_musl.Linux-x86_64.tar.xz
         elif [[ ${{matrix.target}} == "aarch64_cortex-a53" ]]; then
             curl -fL -m 150 -o sdk.tar.xz https://downloads.openwrt.org/releases/$REPO_BRANCH/targets/mediatek/mt7622/openwrt-sdk-$REPO_BRANCH-mediatek-mt7622_gcc-11.2.0_musl.Linux-x86_64.tar.xz || curl -fL -m 150 -o sdk.tar.xz https://downloads.cdn.openwrt.org/releases/$REPO_BRANCH/targets/mediatek/mt7622/openwrt-sdk-$REPO_BRANCH-mediatek-mt7622_gcc-11.2.0_musl.Linux-x86_64.tar.xz
-        elif [[ ${{matrix.target}} == "arm_cortex-a7_neon-vfpv4" ]]; then
-            curl -fL -m 150 -o sdk.tar.xz https://downloads.openwrt.org/releases/$REPO_BRANCH/targets/ipq40xx/generic/openwrt-sdk-$REPO_BRANCH-ipq40xx-generic_gcc-11.2.0_musl_eabi.Linux-x86_64.tar.xz || curl -fL -m 150 -o sdk.tar.xz https://downloads.cdn.openwrt.org/releases/$REPO_BRANCH/targets/ipq40xx/generic/openwrt-sdk-$REPO_BRANCH-ipq40xx-generic_gcc-11.2.0_musl_eabi.Linux-x86_64.tar.xz
-        elif [[ ${{matrix.target}} == "arm_cortex-a9" ]]; then
-            curl -fL -m 150 -o sdk.tar.xz https://downloads.openwrt.org/releases/$REPO_BRANCH/targets/bcm53xx/generic/openwrt-sdk-$REPO_BRANCH-bcm53xx-generic_gcc-11.2.0_musl_eabi.Linux-x86_64.tar.xz || curl -fL -m 150 -o sdk.tar.xz https://downloads.cdn.openwrt.org/releases/$REPO_BRANCH/targets/bcm53xx/generic/openwrt-sdk-$REPO_BRANCH-bcm53xx-generic_gcc-11.2.0_musl_eabi.Linux-x86_64.tar.xz
-        elif [[ ${{matrix.target}} == "arm_cortex-a9_vfpv3-d16" ]]; then
-            curl -fL -m 150 -o sdk.tar.xz https://downloads.openwrt.org/releases/$REPO_BRANCH/targets/mvebu/cortexa9/openwrt-sdk-$REPO_BRANCH-mvebu-cortexa9_gcc-11.2.0_musl_eabi.Linux-x86_64.tar.xz || curl -fL -m 150 -o sdk.tar.xz https://downloads.cdn.openwrt.org/releases/$REPO_BRANCH/targets/mvebu/cortexa9/openwrt-sdk-$REPO_BRANCH-mvebu-cortexa9_gcc-11.2.0_musl_eabi.Linux-x86_64.tar.xz
-        elif [[ ${{matrix.target}} == "arm_xscale" ]]; then
-            curl -fL -m 150 -o sdk.tar.xz https://downloads.openwrt.org/releases/$REPO_BRANCH/targets/kirkwood/generic/openwrt-sdk-$REPO_BRANCH-kirkwood_gcc-11.2.0_musl_eabi.Linux-x86_64.tar.xz || curl -fL -m 150 -o sdk.tar.xz https://downloads.cdn.openwrt.org/releases/$REPO_BRANCH/targets/kirkwood/generic/openwrt-sdk-$REPO_BRANCH-kirkwood_gcc-11.2.0_musl_eabi.Linux-x86_64.tar.xz
-        fi
+        #elif [[ ${{matrix.target}} == "arm_cortex-a7_neon-vfpv4" ]]; then
+           # curl -fL -m 150 -o sdk.tar.xz https://downloads.openwrt.org/releases/$REPO_BRANCH/targets/ipq40xx/generic/openwrt-sdk-$REPO_BRANCH-ipq40xx-generic_gcc-11.2.0_musl_eabi.Linux-x86_64.tar.xz || curl -fL -m 150 -o sdk.tar.xz https://downloads.cdn.openwrt.org/releases/$REPO_BRANCH/targets/ipq40xx/generic/openwrt-sdk-$REPO_BRANCH-ipq40xx-generic_gcc-11.2.0_musl_eabi.Linux-x86_64.tar.xz
+        #elif [[ ${{matrix.target}} == "arm_cortex-a9" ]]; then
+            #curl -fL -m 150 -o sdk.tar.xz https://downloads.openwrt.org/releases/$REPO_BRANCH/targets/bcm53xx/generic/openwrt-sdk-$REPO_BRANCH-bcm53xx-generic_gcc-11.2.0_musl_eabi.Linux-x86_64.tar.xz || curl -fL -m 150 -o sdk.tar.xz https://downloads.cdn.openwrt.org/releases/$REPO_BRANCH/targets/bcm53xx/generic/openwrt-sdk-$REPO_BRANCH-bcm53xx-generic_gcc-11.2.0_musl_eabi.Linux-x86_64.tar.xz
+        #elif [[ ${{matrix.target}} == "arm_cortex-a9_vfpv3-d16" ]]; then
+            #curl -fL -m 150 -o sdk.tar.xz https://downloads.openwrt.org/releases/$REPO_BRANCH/targets/mvebu/cortexa9/openwrt-sdk-$REPO_BRANCH-mvebu-cortexa9_gcc-11.2.0_musl_eabi.Linux-x86_64.tar.xz || curl -fL -m 150 -o sdk.tar.xz https://downloads.cdn.openwrt.org/releases/$REPO_BRANCH/targets/mvebu/cortexa9/openwrt-sdk-$REPO_BRANCH-mvebu-cortexa9_gcc-11.2.0_musl_eabi.Linux-x86_64.tar.xz
+        #elif [[ ${{matrix.target}} == "arm_xscale" ]]; then
+            #curl -fL -m 150 -o sdk.tar.xz https://downloads.openwrt.org/releases/$REPO_BRANCH/targets/kirkwood/generic/openwrt-sdk-$REPO_BRANCH-kirkwood_gcc-11.2.0_musl_eabi.Linux-x86_64.tar.xz || curl -fL -m 150 -o sdk.tar.xz https://downloads.cdn.openwrt.org/releases/$REPO_BRANCH/targets/kirkwood/generic/openwrt-sdk-$REPO_BRANCH-kirkwood_gcc-11.2.0_musl_eabi.Linux-x86_64.tar.xz
+        #fi
 
     - name: Free up disk space
       if: env.FREE_UP_DISK == 'true'
