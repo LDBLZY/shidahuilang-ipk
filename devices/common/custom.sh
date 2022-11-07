@@ -28,7 +28,7 @@ status=$(curl -H "Authorization: token $REPO_TOKEN" -s "https://api.github.com/r
 done
 
 ./scripts/feeds update -a
-./scripts/feeds install -a -p kiddin9 -f
+./scripts/feeds install -a -p makebl -f
 ./scripts/feeds install -a
 
 rm -rf feeds/packages/lang/golang
