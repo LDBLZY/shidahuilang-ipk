@@ -62,15 +62,15 @@ jobs:
         echo "UPLOAD_FIRMWARE_TO_COWTRANSFER=${UPLOAD_FIRMWARE_TO_COWTRANSFER}" >> $GITHUB_ENV
         echo "UPLOAD_FIRMWARE_TO_WETRANSFER=${UPLOAD_FIRMWARE_TO_WETRANSFER}" >> $GITHUB_ENV
         if [ ${{matrix.target}} == "ac2100" ]; then
-            echo "MTARGET=mipsel_24kc" >> $GITHUB_ENV
+            echo "MTARGET=ac2100-mipsel_24kc" >> $GITHUB_ENV
         elif [ ${{matrix.target}} == "x86_64" ]; then
             echo "MTARGET=x86_64" >> $GITHUB_ENV
         elif [ ${{matrix.target}} == "Rpi-4B" ]; then
-            echo "MTARGET=aarch64_cortex-a72" >> $GITHUB_ENV
+            echo "MTARGET=Rpi-aarch64_cortex-a72" >> $GITHUB_ENV
          elif [ ${{matrix.target}} == "nanopi-r2s" ]; then
-            echo "MTARGET=aarch64_generic" >> $GITHUB_ENV
+            echo "MTARGET=nanopi-aarch64_generic" >> $GITHUB_ENV
          elif [ ${{matrix.target}} == "N1" ]; then
-            echo "MTARGET=aarch64_cortex-a53" >> $GITHUB_ENV
+            echo "MTARGET=N1-aarch64_cortex-a53" >> $GITHUB_ENV
         fi
 
     - name: 触发更新
@@ -314,20 +314,5 @@ jobs:
       run: |
        [ ${{ env.status }} == 'success' ] && curl -k --data chat_id="${{ secrets.TELEGRAM_CHAT_ID }}" --data "text=🎉 OpenWrt ${{ env.date3 }} ${{ env.MTARGET }} 软件仓库已更新 😋  ${{ env.COWURL }}   ${{ env.WETRANS }} 🚀" "https://api.telegram.org/bot${{ secrets.TELEGRAM_TOKEN }}/sendMessage"
 
-    - name: 删除工作流
-      uses: Mattraks/delete-workflow-runs@v2
-      continue-on-error: false
-      with:
-        retain_days: 1
-        keep_minimum_runs: 1
 
-    - name: 删除旧版本
-      uses: shidahuilang/delete-older-releases@main
-      continue-on-error: true
-      if: env.UPLOAD_FIRMWARE_FOR_RELEASE == 'true' && !cancelled()
-      with:
-        keep_latest: 3
-        delete_tags: false
-      env:
-        GITHUB_TOKEN: ${{ secrets.REPO_TOKEN }}
 
