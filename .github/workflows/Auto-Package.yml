@@ -178,7 +178,7 @@ jobs:
         mkdir package/feeds/custom
         mv -f custom.b/{wxbase,lib*,rapidjson,jpcre2,quickjspp,qtbase,qttools,rblibtorrent} package/feeds/custom/
 
-    - name: 编译固件
+    - name: 编译插件
       run: |
         cd openwrt
           echo -e "$(($(nproc)+1)) thread compile"
@@ -239,7 +239,7 @@ jobs:
            echo "NAME=❌ ${{ env.date2 }} ${{ env.MTARGET }} ❌" >> $GITHUB_ENV
         fi
 
-    - name: 上传文件到 cowtransfer
+    - name: 上传插件到 cowtransfer
       if: env.UPLOAD_FIRMWARE_TO_COWTRANSFER == 'true'
       continue-on-error: true
       run: |
@@ -249,7 +249,7 @@ jobs:
         echo "COWURL=$cowurl" >> $GITHUB_ENV
         echo "Download Link: ${{ env.EMOJI }} $cowurl ${{ env.EMOJI }} 🎈"
  
-    - name: 上传文件到 WeTransfer
+    - name: 上传插件到 WeTransfer
       if: env.UPLOAD_FIRMWARE_TO_WETRANSFER == 'true'
       continue-on-error: true
       run: |
@@ -283,7 +283,7 @@ jobs:
         tag_name: ${{ env.date1 }}_${{ env.MTARGET }}
         body_path: release.txt
 
-    - name: 上传文件到 artifact
+    - name: 上传插件到 artifact
       uses: actions/upload-artifact@main
       continue-on-error: true
       if: env.UPLOAD_FIRMWARE_FOR_ARTIFACT == 'true'
@@ -291,7 +291,7 @@ jobs:
         name: ${{ env.date3 }} ${{ env.MTARGET }}
         path: ${{ env.FIRMWARE }}
 
-    - name: 上传文件到服务器
+    - name: 上传插件到服务器
       uses: easingthemes/ssh-deploy@main
       if: env.SSH_PRIVATE_KEY && ! contains(github.event.action, 'noser')
       with:
