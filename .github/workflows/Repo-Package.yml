@@ -29,9 +29,9 @@ env:
 
 jobs:
   build:
-    runs-on: Ubuntu-22.04
+    runs-on: Ubuntu-20.04
     steps:
-    - name: 触发更新
+    - name: Trigger matrix Update
       run: |
         gitdate=$(curl -H "Authorization: token ${{ secrets.REPO_TOKEN }}" -s "https://api.github.com/repos/makebl/packages/commits?&per_page=1" | jq -r '.[0].commit.committer.date')
         fpkg="$(echo "${{github.event.inputs.packages}}" | sed -e 's/\(aarch64_generic\|x86_64\|aarch64_cortex-a72\|nanopi-r2s\|Rpi-4B\|N1\|ac2100\| [0-9][0-9.]*\| ssh\| noser\| cw\)//g' | sed -e 's/ //g')"
@@ -63,20 +63,20 @@ jobs:
           -H "Authorization: token ${{ secrets.REPO_TOKEN }}" \
           -d '{"event_type": "aarch64_cortex-a72 ${{ github.event.inputs.packages }}", "client_payload": {"target": "Rpi-4B"}}'
 
-    - name: 删除工作流
+    - name: Delete workflow runs
       uses: Mattraks/delete-workflow-runs@v2
       continue-on-error: true
       with:
         retain_days: 1
         keep_minimum_runs: 0
 
-    - name: 删除旧版本
+    - name: Remove old Releases
       uses: shidahuilang/delete-older-releases@main
       continue-on-error: true
       if: env.UPLOAD_FIRMWARE_FOR_RELEASE == 'true' && !cancelled()
       with:
-        keep_latest: 10
-        delete_tags: false
+        keep_latest: 3
+        delete_tags: true
       env:
         GITHUB_TOKEN: ${{ secrets.REPO_TOKEN }}  
 
