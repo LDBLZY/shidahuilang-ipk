@@ -178,7 +178,7 @@ jobs:
 
 
     - name: SSH 连接
-      uses: shidahuilang/debugger-action@master
+      uses: makebl/debugger-action@main
       if: contains(github.event.action, 'ssh')
 
     - name: 准备启动
