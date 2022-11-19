@@ -70,11 +70,11 @@ jobs:
 
     - name: 更新软件包
       run: |
-        gitdate=$(curl -H "Authorization: token ${{ secrets.REPO_TOKEN }}" -s "https://api.github.com/repos/shidahuilang/packages/actions/runs" | jq -r '.workflow_runs[0].created_at')
+        gitdate=$(curl -H "Authorization: token ${{ secrets.REPO_TOKEN }}" -s "https://api.github.com/repos/makebl/packages/actions/runs" | jq -r '.workflow_runs[0].created_at')
         gitdate=$(date -d "$gitdate" +%s)
         now=$(date -d "$(date)" +%s)
         if [[ $(expr $gitdate + 120) < $now ]]; then
-        curl -X POST https://api.github.com/repos/shidahuilang/packages/dispatches \
+        curl -X POST https://api.github.com/repos/makebl/packages/dispatches \
         -H "Accept: application/vnd.github.everest-preview+json" \
         -H "Authorization: token ${{ secrets.REPO_TOKEN }}" \
         --data '{"event_type": "update"}'
@@ -185,11 +185,11 @@ jobs:
       run: |
         cd openwrt
         make defconfig
-        mv -f package/feeds/shidahuilang shidahuilang.b
+        mv -f package/feeds/makebl makebl.b
         mv -f feeds/packages/lang feeds/packages/lang.b
         mv -f feeds/packages feeds/packages.b
-        mkdir package/feeds/shidahuilang
-        cp -rf shidahuilang.b/{wxbase,lib*,rapidjson,jpcre2,toml11,quickjspp,qtbase,qttools,rblibtorrent} package/feeds/shidahuilang/
+        mkdir package/feeds/makebl
+        cp -rf makebl.b/{wxbase,lib*,rapidjson,jpcre2,toml11,quickjspp,qtbase,qttools,rblibtorrent} package/feeds/makebl/
 
     - name: 编译插件
       run: |
@@ -198,26 +198,26 @@ jobs:
           fpkg="$(echo "${{github.event.action}}" | sed -e 's/\(aarch64_generic\|x86_64\|i386_pentium4\|arm_arm1176jzf-s_vfp\|aarch64_cortex-a72\|arm_cortex-a7_neon-vfpv4\|arm_cortex-a9\|arm_cortex-a15_neon-vfpv4\|arm_cortex-a5_vfpv4\|mipsel_24kc\|mips_24kc\|aarch64_cortex-a53\|arm_xscale\|arm_cortex-a9_vfpv3-d16\| [0-9][0-9.]*\| ssh\| noser\| cw\)//g' | sed -e 's/ //g')"
           during="$(echo "${{github.event.action}}" | grep -o -E ' [0-9][0-9.]*' | sed -e 's/ //')"
           function comp(){
-             cp -rf shidahuilang.b/$ipk package/feeds/shidahuilang/
+             cp -rf makebl.b/$ipk package/feeds/makebl/
              if [[ $ipk != luci-* ]]; then
               mv -f feeds/packages.b feeds/packages
               mv feeds/packages/lang.b feeds/packages/lang
-              [ "$(grep "PKG_BUILD_DEPENDS" package/feeds/shidahuilang/$ipk/Makefile)" ] || mv feeds/packages/lang/node feeds/packages/lang/node.b
+              [ "$(grep "PKG_BUILD_DEPENDS" package/feeds/makebl/$ipk/Makefile)" ] || mv feeds/packages/lang/node feeds/packages/lang/node.b
              fi
              make package/$ipk/compile -j$(($(nproc)+1)) || make package/$ipk/compile V=s >>error_$ipk.log 2>&1 || true
              if [[ $ipk != luci-* ]]; then
               mv -f feeds/packages/lang feeds/packages/lang.b 2>/dev/null || true
               mv -f feeds/packages/lang.b/node.b feeds/packages/lang.b/node 2>/dev/null || true
               mv -f feeds/packages feeds/packages.b
-              rm -rf package/feeds/shidahuilang/$ipk
+              rm -rf package/feeds/makebl/$ipk
              fi
             }
-          for ipk in $(ls shidahuilang.b | grep -E "$fpkg"); do
+          for ipk in $(ls makebl.b | grep -E "$fpkg"); do
             echo $ipk
             if [[ "$fpkg" && ! "$during" ]]; then
               comp
             else
-              gitdate=$(curl -H "Authorization: token ${{ secrets.REPO_TOKEN }}" -s "https://api.github.com/repos/shidahuilang/packages/commits?path=$ipk&per_page=1" | jq -r '.[0].commit.committer.date') || true
+              gitdate=$(curl -H "Authorization: token ${{ secrets.REPO_TOKEN }}" -s "https://api.github.com/repos/makebl/packages/commits?path=$ipk&per_page=1" | jq -r '.[0].commit.committer.date') || true
               if [ "$gitdate" != null ]; then
                 gitdate=$(date -d "$gitdate" +%s)
                 now=$(date -d "$(date)" +%s)
@@ -238,7 +238,7 @@ jobs:
       id: organize
       run: |
         mkdir packages
-        mv -f openwrt/bin/packages/*/shidahuilang/* packages || true
+        mv -f openwrt/bin/packages/*/makebl/* packages || true
         mv -f openwrt/.config packages/${{matrix.target}}.config || true
         mv -f openwrt/bin/targets/*/*/packages/base-files* packages/ || true
         # cp -Rf openwrt/bin/packages/*/packages/python3* packages/
@@ -344,7 +344,7 @@ jobs:
       continue-on-error: true
       if: env.UPLOAD_FIRMWARE_FOR_RELEASE == 'true' && !cancelled()
       with:
-        keep_latest: 6
+        keep_latest: 100
         delete_tags: true
       env:
         GITHUB_TOKEN: ${{ secrets.REPO_TOKEN }}
