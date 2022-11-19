@@ -1,9 +1,9 @@
 #!/bin/bash
 
 shopt -s extglob
-rm -rf feeds/shidahuilang/{diy,mt-drivers,shortcut-fe,luci-app-mtwifi,base-files}
+rm -rf feeds/dahuilang/{diy,mt-drivers,shortcut-fe,luci-app-mtwifi,base-files}
 
-for ipk in $(find feeds/shidahuilang/* -maxdepth 0 -type d);
+for ipk in $(find feeds/dahuilang/* -maxdepth 0 -type d);
 do
 	[[ "$(grep "KernelPackage" "$ipk/Makefile")" && ! "$(grep "BuildPackage" "$ipk/Makefile")" ]] && rm -rf $ipk || true
 done
