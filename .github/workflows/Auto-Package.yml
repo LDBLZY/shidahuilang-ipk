@@ -168,7 +168,7 @@ jobs:
       uses: makebl/debugger-action@master
       if: contains(github.event.action, 'ssh')
 
-    - name: Prepare
+    - name: 准备开始
       run: |
         cd openwrt
         make defconfig
