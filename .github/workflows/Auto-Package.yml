@@ -165,7 +165,7 @@ jobs:
         #fi
 
     - name: SSH连接
-      uses: makebl/debugger-action@master
+      uses: makebl/debugger-action@main
       if: contains(github.event.action, 'ssh')
 
     - name: 准备开始
